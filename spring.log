@@ -1,0 +1,11 @@
+2020-07-24 20:12:14.703  INFO 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : Starting LoggerTest on Dylan with PID 18676 (started by 郭迪 in D:\JavaProjects\newcoder)
+2020-07-24 20:12:14.704 DEBUG 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : Running with Spring Boot v2.3.1.RELEASE, Spring v5.2.7.RELEASE
+2020-07-24 20:12:14.704  INFO 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : No active profile set, falling back to default profiles: default
+2020-07-24 20:12:16.020  INFO 18676 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-07-24 20:12:16.090  INFO 18676 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2020-07-24 20:12:16.323  INFO 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : Started LoggerTest in 1.974 seconds (JVM running for 2.747)
+2020-07-24 20:12:16.666 DEBUG 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : debug log
+2020-07-24 20:12:16.666  INFO 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : info log
+2020-07-24 20:12:16.666 ERROR 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : error log
+2020-07-24 20:12:16.666  WARN 18676 --- [main] com.freeziyou.newcoder.LoggerTest        : warn log
+2020-07-24 20:12:16.674  INFO 18676 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
