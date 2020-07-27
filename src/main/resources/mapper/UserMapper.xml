@@ -30,19 +30,25 @@
     </select>
 
     <insert id="insertUser" parameterType="User" keyProperty="id">
-        insert into newcoder_community.user (<include refid="insertFields"/>) values (#{username}, #{password},
-        #{email}, #{salt}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime});
+        insert into newcoder_community.user (<include refid="insertFields"/>) values (#{username}, #{password}, #{salt},
+        #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime});
     </insert>
 
     <update id="updateStatus">
-        update newcoder_community.user set status=#{status} where id=#{id};
+        update newcoder_community.user
+        set status=#{status}
+        where id = #{id};
     </update>
 
     <update id="updateHeader">
-        update newcoder_community.user set header_url=#{headerUrl} where id=#{id};
+        update newcoder_community.user
+        set header_url=#{headerUrl}
+        where id = #{id};
     </update>
 
     <update id="updatePassword">
-        update newcoder_community.user set password=#{password} where id=#{id};
+        update newcoder_community.user
+        set password=#{password}
+        where id = #{id};
     </update>
 </mapper>

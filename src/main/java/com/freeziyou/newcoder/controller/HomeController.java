@@ -39,7 +39,7 @@ public class HomeController {
         page.setRows(discussPostService.selectDiscussPostsRows(0));
         page.setPath("index");
 
-        List<DiscussPost> list = discussPostService.selectDiscussPosts(0, page.getOffset(),page.getLimit());;
+        List<DiscussPost> list = discussPostService.selectDiscussPosts(0, page.getOffset(), page.getLimit());
         List<Map<String, Object>> discussPosts = new ArrayList<>();
         // discussPost 和 user 封装成一个 Map
         if (list != null) {
