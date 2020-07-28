@@ -19,8 +19,6 @@ public interface DiscussPostMapper {
 
     /**
      * 如果只有一个参数, 并且在动态 SQL 中会使用, 则一定要加别名
-     * @param userId
-     * @return
      */
     Integer selectDiscussPostsRows(@Param("userId") Integer userId);
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
  * @date 7/24/2020 10:51
  * @description TODO
  */
+@Repository
 @Mapper
 public interface UserMapper {
     User selectById(Integer id);

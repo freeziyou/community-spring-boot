@@ -1,6 +1,7 @@
 # community-spring-boot
 
-Spring Boot练习项目
-* Thymeleaf
-* MyBatis SpringMVC Spring
-* Swagger2
+仿牛客网站 Spring Boot 练习项目
+* 模板引擎: Thymeleaf
+* 持久层: MyBatis
+* 业务层: SpringMVC Spring
+* 框架: Spring Boot

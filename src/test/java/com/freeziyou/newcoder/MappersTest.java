@@ -1,6 +1,9 @@
 package com.freeziyou.newcoder;
 
+import com.freeziyou.newcoder.dao.LoginTicketMapper;
+import com.freeziyou.newcoder.dao.UserMapper;
 import com.freeziyou.newcoder.entity.DiscussPost;
+import com.freeziyou.newcoder.entity.LoginTicket;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.service.DiscussPostService;
 import com.freeziyou.newcoder.service.UserService;
@@ -25,14 +28,17 @@ import java.util.List;
 public class MappersTest {
 
     @Autowired
-    UserService userService;
+    UserMapper userMapper;
 
     @Autowired
     DiscussPostService discussPostService;
 
+    @Autowired
+    LoginTicketMapper loginTicketMapper;
+
     @Test
     public void test1() {
-        User user = userService.selectById(150);
+        User user = userMapper.selectById(150);
         System.out.println(user);
     }
 
@@ -46,31 +52,51 @@ public class MappersTest {
         user.setHeaderUrl("http://www.nowcoder.com/101.png");
         user.setCreateTime(new Date());
 
-        int rows = userService.insertUser(user);
+        int rows = userMapper.insertUser(user);
         System.out.println(rows);
         System.out.println(user.getId());
     }
 
     @Test
     public void updateUser() {
-        int rows = userService.updateStatus(150, 1);
+        int rows = userMapper.updateStatus(150, 1);
         System.out.println(rows);
 
-        rows = userService.updateHeader(150, "http://www.nowcoder.com/102.png");
+        rows = userMapper.updateHeader(150, "http://www.nowcoder.com/102.png");
         System.out.println(rows);
 
-        rows = userService.updatePassword(150, "hello");
+        rows = userMapper.updatePassword(150, "hello");
         System.out.println(rows);
     }
 
     @Test
     public void testSelectPosts() {
         List<DiscussPost> list = discussPostService.selectDiscussPosts(149, 0, 10);
-        for(DiscussPost post : list) {
+        for (DiscussPost post : list) {
             System.out.println(post);
         }
 
 //        int rows = discussPostService.selectDiscussPostsRows(149);
 //        System.out.println(rows);
+    }
+
+    @Test
+    public void testInsertLoginTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(1000);
+        loginTicket.setTicket("qqq");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+
+    @Test
+    public void testUpdateLoginTicket() {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("qqq");
+        System.out.println(loginTicket);
+        loginTicketMapper.updateStatus("qqq", 1);
+        loginTicket = loginTicketMapper.selectByTicket("qqq");
+        System.out.println(loginTicket);
     }
 }

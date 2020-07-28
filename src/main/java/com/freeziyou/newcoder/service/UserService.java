@@ -1,6 +1,8 @@
 package com.freeziyou.newcoder.service;
 
+import com.freeziyou.newcoder.dao.LoginTicketMapper;
 import com.freeziyou.newcoder.dao.UserMapper;
+import com.freeziyou.newcoder.entity.LoginTicket;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.util.CommunityConstant;
 import com.freeziyou.newcoder.util.CommunityUtil;
@@ -23,7 +25,7 @@ import java.util.Random;
  * @description TODO
  */
 @Service
-public class UserService implements UserMapper, CommunityConstant {
+public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
 
@@ -32,6 +34,9 @@ public class UserService implements UserMapper, CommunityConstant {
 
     @Autowired
     private TemplateEngine templateEngine;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Value("${newcoder.path.domain}")
     private String domain;
@@ -67,12 +72,12 @@ public class UserService implements UserMapper, CommunityConstant {
         }
 
         // 验证邮箱
-//        checkUser = userMapper.selectByEmail(user.getEmail());
-//        System.out.println(checkUser);
-//        if (checkUser != null) {
-//            map.put("emailMsg", "此邮箱已被注册!");
-//            return map;
-//        }
+        checkUser = userMapper.selectByEmail(user.getEmail());
+        System.out.println(checkUser);
+        if (checkUser != null) {
+            map.put("emailMsg", "此邮箱已被注册!");
+            return map;
+        }
 
         // 注册用户
         user.setSalt(CommunityUtil.generateUUID().substring(5, 10));
@@ -109,38 +114,58 @@ public class UserService implements UserMapper, CommunityConstant {
         }
     }
 
-    @Override
-    public User selectById(Integer id) {
-        return userMapper.selectById(id);
+    public Map<String, Object> login(String username, String password, int expiredSeconds) {
+        Map<String, Object> map = new HashMap<>();
+
+        // 空值处理
+        if (StringUtils.isBlank(username)) {
+            map.put("usernameMsg", "账号不能为空!");
+            return map;
+        }
+
+        if (StringUtils.isBlank(password)) {
+            map.put("passwordMsg", "密码不能为空!");
+            return map;
+        }
+
+        // 验证账号
+        User user = userMapper.selectByName(username);
+        if (user == null) {
+            map.put("usernameMsg", "账号不存在!");
+            return map;
+        }
+
+        // 验证状态
+        if (user.getStatus() == 0) {
+            map.put("usernameMsg", "账号未激活!");
+            return map;
+        }
+
+        // 验证密码
+        String encryptPassword = CommunityUtil.md5(password + user.getSalt());
+        if (!user.getPassword().equals(encryptPassword)) {
+            map.put("passwordMsg", "密码错误!");
+            return map;
+        }
+
+        // 生成登陆凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(CommunityUtil.generateUUID());
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000 * 12));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        map.put("ticket", loginTicket.getTicket());
+        return map;
     }
 
-    @Override
-    public User selectByName(String username) {
-        return null;
+    public void logout(String ticket) {
+        loginTicketMapper.updateStatus(ticket, 1);
     }
 
-    @Override
-    public User selectByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public Integer insertUser(User user) {
-        return userMapper.insertUser(user);
-    }
-
-    @Override
-    public Integer updateStatus(Integer id, Integer status) {
-        return userMapper.updateStatus(id, status);
-    }
-
-    @Override
-    public Integer updateHeader(Integer id, String headerUrl) {
-        return userMapper.updateHeader(id, headerUrl);
-    }
-
-    @Override
-    public Integer updatePassword(Integer id, String password) {
-        return userMapper.updatePassword(id, password);
+    public User selectById(int userId) {
+        return userMapper.selectById(userId);
     }
 }
