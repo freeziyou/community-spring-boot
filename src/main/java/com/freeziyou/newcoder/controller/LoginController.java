@@ -129,8 +129,6 @@ public class LoginController implements CommunityConstant {
             model.addAttribute("passwordMsg", map.get("passwordMsg"));
             return "site/login";
         }
-
-
     }
 
     @GetMapping("/logout")

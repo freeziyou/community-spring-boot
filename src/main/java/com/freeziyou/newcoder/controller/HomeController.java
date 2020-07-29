@@ -5,18 +5,15 @@ import com.freeziyou.newcoder.entity.Page;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.service.DiscussPostService;
 import com.freeziyou.newcoder.service.UserService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Dylan Guo
@@ -46,7 +43,7 @@ public class HomeController {
             for (DiscussPost discussPost : list) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("post", discussPost);
-                User user = userService.selectById(discussPost.getUserId());
+                User user = userService.findUserById(discussPost.getUserId());
                 map.put("user", user);
                 discussPosts.add(map);
             }
