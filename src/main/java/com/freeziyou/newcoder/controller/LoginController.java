@@ -54,6 +54,10 @@ public class LoginController implements CommunityConstant {
         return "site/login";
     }
 
+    @GetMapping("/forget")
+    public String forget() {
+        return "site/forget";
+    }
 
     @PostMapping("/register")
     public String register(Model model, User user) {
@@ -135,5 +139,19 @@ public class LoginController implements CommunityConstant {
     public String logout(@CookieValue("ticket") String ticket) {
         userService.logout(ticket);
         return "redirect:/login";
+    }
+
+    @GetMapping("/forget/captcha/{email}")
+    public String getForgetCaptcha(HttpSession session, @PathVariable String email, Model model) {
+        // 生成验证码并发送
+        String code = userService.sendForgetCaptcha(email);
+
+        // 验证码存入 session
+        session.setAttribute("forgetCaptcha", code);
+
+        model.addAttribute("email", email);
+//        model.addAttribute("codeMsg", "已发送邮件, 请查收!");
+        System.out.println("code==============" + code);
+        return "/site/forget";
     }
 }

@@ -1,5 +1,6 @@
 package com.freeziyou.newcoder.controller;
 
+import com.freeziyou.newcoder.annotation.LoginRequired;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.service.UserService;
 import com.freeziyou.newcoder.util.CommunityUtil;
@@ -17,13 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -53,11 +52,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage() {
         return "site/setting";
     }
 
+    @LoginRequired
     @PostMapping("/upload")
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if (headerImage == null) {
@@ -115,10 +116,11 @@ public class UserController {
         }
     }
 
+    @LoginRequired
     @PostMapping("/password")
     public String updatePassword(String oldPassword, String newPassword, Model model) {
         User user = hostHolder.getUser();
-        Map<String, Object> map = userService.updatePassword(user.getId(), oldPassword, newPassword);
+        Map<String, Object> map = userService.updateNewPassword(user.getId(), oldPassword, newPassword);
 
         // 修改失败
         if (map.containsKey("passwordMsg")) {

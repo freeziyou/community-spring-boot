@@ -177,22 +177,49 @@ public class UserService implements CommunityConstant {
         return userMapper.updateHeader(userId, headUrl);
     }
 
-    public Map<String, Object> updatePassword(int userId, String oldPassword, String newPassword) {
+    /**
+     * 重置密码
+     * @param userId 用户id
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return 修改结果, map 里存放错误信息
+     */
+    public Map<String, Object> updateNewPassword(int userId, String oldPassword, String newPassword) {
         Map<String, Object> map = new HashMap<>();
         User user = userMapper.selectById(userId);
+        oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
+        newPassword = CommunityUtil.md5(newPassword + user.getSalt());
 
         // 检查原密码
-        oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
         if (!oldPassword.equals(user.getPassword())) {
             map.put("passwordMsg", "原密码输入错误!");
             return map;
+        } else if (newPassword.equals(user.getPassword())) {
+            map.put("passwordMsg", "新密码与原密码相同!");
+            return map;
         }
-
         // 更新密码
-        newPassword = CommunityUtil.md5(newPassword + user.getSalt());
         userMapper.updatePassword(userId, newPassword);
-
         return map;
     }
 
+    /**
+     * 发送找回密码的验证码
+     * @param email 用户邮箱
+     * @return 验证码
+     */
+    public String sendForgetCaptcha(String email) {
+        // 获取用户
+        User user = userMapper.selectByEmail(email);
+        // 生成验证码
+        String captcha = user.getActivationCode().substring(5, 10);
+        // 发送邮件
+        Context context = new Context();
+        context.setVariable("email", user.getEmail());
+        context.setVariable("captcha", captcha);
+        String content = templateEngine.process("/mail/forget", context);
+        mailClientUtil.sendMail(user.getEmail(), "重置账号密码------" + user.getUsername(), content);
+
+        return captcha;
+    }
 }
