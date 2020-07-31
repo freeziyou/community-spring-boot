@@ -89,7 +89,7 @@ public class UserService implements CommunityConstant {
         user.setType(0);
         user.setStatus(0);
         user.setActivationCode(CommunityUtil.generateUUID());
-        user.setHeaderUrl(String.format("http://images.newcoder.com/head/%dt.png", new Random().nextInt(1000)));
+        user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         user.setCreateTime(new Date());
 
         userMapper.insertUser(user);
@@ -102,7 +102,6 @@ public class UserService implements CommunityConstant {
         context.setVariable("url", url);
         String content = templateEngine.process("/mail/activation", context);
         mailClientUtil.sendMail(user.getEmail(), "激活账号", content);
-
         return map;
     }
 
@@ -179,7 +178,8 @@ public class UserService implements CommunityConstant {
 
     /**
      * 重置密码
-     * @param userId 用户id
+     *
+     * @param userId      用户id
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return 修改结果, map 里存放错误信息
@@ -205,6 +205,7 @@ public class UserService implements CommunityConstant {
 
     /**
      * 发送找回密码的验证码
+     *
      * @param email 用户邮箱
      * @return 验证码
      */
@@ -221,5 +222,24 @@ public class UserService implements CommunityConstant {
         mailClientUtil.sendMail(user.getEmail(), "重置账号密码------" + user.getUsername(), content);
 
         return captcha;
+    }
+
+    public User findUserByEmail(String email) {
+        return userMapper.selectByEmail(email);
+    }
+
+    public Map<String, Object> resetPassword(String email, String password) {
+        Map<String, Object> map = new HashMap<>();
+        // 获取当前操作用户
+        User user = userMapper.selectByEmail(email);
+        // 重置密码
+        password = CommunityUtil.encryptPassword(password, user.getSalt());
+        if (user.getPassword().equals(password)) {
+            map.put("passwordMsg", "新密码与原密码相同, 请重新输入!");
+            return map;
+        }
+        userMapper.updatePassword(user.getId(), password);
+
+        return map;
     }
 }

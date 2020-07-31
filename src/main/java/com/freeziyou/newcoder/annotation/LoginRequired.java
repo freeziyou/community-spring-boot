@@ -8,12 +8,11 @@ import java.lang.annotation.Target;
 /**
  * @author Dylan Guo
  * @date 7/29/2020 22:01
- * @description TODO
+ * @description 自定义注解: 被标记的方法需要登录才能执行
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoginRequired {
-
 
 
 }

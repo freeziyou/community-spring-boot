@@ -28,4 +28,8 @@ public class CommunityUtil {
         }
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
+
+    public static String encryptPassword(String password, String salt) {
+        return md5(password + salt);
+    }
 }

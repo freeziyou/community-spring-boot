@@ -29,11 +29,13 @@ import java.util.Map;
  * @author Dylan Guo
  * @date 7/27/2020 16:21
  * @description TODO
+ * bug:
+ * 1.忘记密码中, 验证码可被多个用户使用, 没有唯一性
  */
 @Controller
 public class LoginController implements CommunityConstant {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private UserService userService;
@@ -106,7 +108,7 @@ public class LoginController implements CommunityConstant {
             OutputStream os = response.getOutputStream();
             ImageIO.write(image, "png", os);
         } catch (IOException e) {
-            logger.error("响应验证码失败: " + e.getMessage());
+            log.error("响应验证码失败: " + e.getMessage());
         }
     }
 
@@ -150,8 +152,28 @@ public class LoginController implements CommunityConstant {
         session.setAttribute("forgetCaptcha", code);
 
         model.addAttribute("email", email);
-//        model.addAttribute("codeMsg", "已发送邮件, 请查收!");
-        System.out.println("code==============" + code);
+        log.info("------验证码: " + code + "------");
         return "/site/forget";
+    }
+
+
+    @PostMapping("/forget")
+    public String forgetPassword(HttpSession session, String email, String code, String password, Model model) {
+        // 比对验证码
+        String captcha = (String) session.getAttribute("forgetCaptcha");
+        if (StringUtils.isBlank(captcha) || StringUtils.isBlank(code) || !captcha.equalsIgnoreCase(code)) {
+            model.addAttribute("codeMsg", "验证码不正确");
+            return "site/forget";
+        }
+        // 重置密码
+        Map<String, Object> map = userService.resetPassword(email, password);
+        if (map.containsKey("passwordMsg")) {
+            // 修改失败, 回显信息
+            model.addAttribute("passwordMsg", map.get("passwordMsg"));
+            return "site/forget";
+        }
+
+        // 修改成功, 跳转登录页面
+        return "site/login";
     }
 }

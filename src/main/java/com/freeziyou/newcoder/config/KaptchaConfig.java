@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * @author Dylan Guo
  * @date 7/28/2020 13:24
- * @description TODO
+ * @description 验证码设置
  */
 @Configuration
 public class KaptchaConfig {

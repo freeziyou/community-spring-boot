@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * @author Dylan Guo
  * @date 7/29/2020 11:14
- * @description TODO
+ * @description 注册拦截器
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
