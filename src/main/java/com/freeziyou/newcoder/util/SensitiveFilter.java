@@ -42,6 +42,7 @@ public class SensitiveFilter {
                 // 添加到前缀树
                 this.addKeyword(keyword);
             }
+
         } catch (IOException e) {
             log.error("加载敏感词失败: " + e.getMessage());
         }
@@ -173,4 +174,10 @@ public class SensitiveFilter {
         }
     }
 
+
+    public static void main(String[] args) {
+        String test = "黄赌毒嘎嘎嘎嘎, 傻逼啊啊啊啊";
+        SensitiveFilter sensitiveFilter = new SensitiveFilter();
+        System.out.println(sensitiveFilter.filter(test));
+    }
 }

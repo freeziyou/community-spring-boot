@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
  * @description TODO
  */
 @Repository
-@Mapper
 public interface UserMapper {
     User selectById(Integer id);
 

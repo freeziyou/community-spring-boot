@@ -1,9 +1,12 @@
 package com.freeziyou.newcoder.util;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.mockito.internal.util.StringUtil;
 import org.springframework.util.DigestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -32,4 +35,25 @@ public class CommunityUtil {
     public static String encryptPassword(String password, String salt) {
         return md5(password + salt);
     }
+
+    public static String getJsonString(int code, String msg, Map<String, Object> map) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", code);
+        jsonObject.put("msg", msg);
+        if (map != null) {
+            for (String key : map.keySet()) {
+                jsonObject.put(key, map.get(key));
+            }
+        }
+        return jsonObject.toJSONString();
+    }
+
+    public static String getJsonString(int code, String msg) {
+        return getJsonString(code, msg, null);
+    }
+
+    public static String getJsonString(int code) {
+        return getJsonString(code, null, null);
+    }
+
 }

@@ -2,8 +2,10 @@ package com.freeziyou.newcoder.service;
 
 import com.freeziyou.newcoder.dao.DiscussPostMapper;
 import com.freeziyou.newcoder.entity.DiscussPost;
+import com.freeziyou.newcoder.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 
@@ -13,19 +15,34 @@ import java.util.List;
  * @description TODO
  */
 @Service
-public class DiscussPostService implements DiscussPostMapper{
+public class DiscussPostService {
 
     @Autowired
-    DiscussPostMapper discussPostMapper;
+    private DiscussPostMapper discussPostMapper;
 
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
 
-    @Override
     public List<DiscussPost> selectDiscussPosts(Integer userId, Integer offset, Integer limit) {
         return discussPostMapper.selectDiscussPosts(userId, offset, limit);
     }
 
-    @Override
-    public Integer selectDiscussPostsRows(Integer userId) {
+    public int selectDiscussPostsRows(Integer userId) {
         return discussPostMapper.selectDiscussPostsRows(userId);
+    }
+
+    public int addDiscussPost(DiscussPost discussPost) {
+        if (discussPost == null) {
+            throw new IllegalArgumentException("参数不能为空!");
+        }
+
+        // 转义 HTML 标记
+        discussPost.setTitle(HtmlUtils.htmlEscape(discussPost.getTitle()));
+        discussPost.setContent(HtmlUtils.htmlEscape(discussPost.getContent()));
+        // 过滤敏感词
+        discussPost.setTitle(sensitiveFilter.filter(discussPost.getTitle()));
+        discussPost.setContent(sensitiveFilter.filter(discussPost.getContent()));
+
+        return discussPostMapper.insertDiscussPost(discussPost);
     }
 }

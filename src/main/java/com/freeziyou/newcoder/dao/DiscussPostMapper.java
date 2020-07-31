@@ -12,7 +12,7 @@ import java.util.List;
  * @date 7/24/2020 13:35
  * @description TODO
  */
-@Mapper
+@Repository
 public interface DiscussPostMapper {
 
     List<DiscussPost> selectDiscussPosts(Integer userId, Integer offset, Integer limit);
@@ -20,5 +20,7 @@ public interface DiscussPostMapper {
     /**
      * 如果只有一个参数, 并且在动态 SQL 中会使用, 则一定要加别名
      */
-    Integer selectDiscussPostsRows(@Param("userId") Integer userId);
+    int selectDiscussPostsRows(@Param("userId") Integer userId);
+
+    int insertDiscussPost(DiscussPost discussPost);
 }
