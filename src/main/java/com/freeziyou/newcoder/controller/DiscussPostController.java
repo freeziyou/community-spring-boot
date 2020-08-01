@@ -3,13 +3,14 @@ package com.freeziyou.newcoder.controller;
 import com.freeziyou.newcoder.entity.DiscussPost;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.service.DiscussPostService;
+import com.freeziyou.newcoder.service.UserService;
 import com.freeziyou.newcoder.util.CommunityUtil;
 import com.freeziyou.newcoder.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -24,6 +25,9 @@ public class DiscussPostController {
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private HostHolder hostHolder;
@@ -44,6 +48,18 @@ public class DiscussPostController {
         discussPostService.addDiscussPost(post);
 
         return CommunityUtil.getJsonString(0, "发布成功!");
+    }
+
+    @GetMapping("/detail/{discussPostId}")
+    public String getDiscussPost(@PathVariable int discussPostId, Model model) {
+        DiscussPost discussPost = discussPostService.findDiscussPostById(discussPostId);
+        model.addAttribute("post", discussPost);
+
+        // 将 user_id 转换成 username
+        User user = userService.findUserById(discussPost.getUserId());
+        model.addAttribute("user", user);
+
+        return "site/discuss-detail";
     }
 
 }
