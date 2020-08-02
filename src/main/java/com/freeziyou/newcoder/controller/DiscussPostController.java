@@ -1,18 +1,21 @@
 package com.freeziyou.newcoder.controller;
 
+import com.freeziyou.newcoder.entity.Comment;
 import com.freeziyou.newcoder.entity.DiscussPost;
+import com.freeziyou.newcoder.entity.Page;
 import com.freeziyou.newcoder.entity.User;
+import com.freeziyou.newcoder.service.CommentService;
 import com.freeziyou.newcoder.service.DiscussPostService;
 import com.freeziyou.newcoder.service.UserService;
+import com.freeziyou.newcoder.util.CommunityConstant;
 import com.freeziyou.newcoder.util.CommunityUtil;
 import com.freeziyou.newcoder.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author Dylan Guo
@@ -21,7 +24,7 @@ import java.util.Date;
  */
 @Controller
 @RequestMapping("/discuss")
-public class DiscussPostController {
+public class DiscussPostController implements CommunityConstant {
 
     @Autowired
     private DiscussPostService discussPostService;
@@ -30,8 +33,18 @@ public class DiscussPostController {
     private UserService userService;
 
     @Autowired
+    private CommentService commentService;
+
+    @Autowired
     private HostHolder hostHolder;
 
+    /**
+     * 添加帖子
+     *
+     * @param title   帖子标题
+     * @param content 帖子内容
+     * @return 发布结果
+     */
     @PostMapping("/add")
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -50,8 +63,16 @@ public class DiscussPostController {
         return CommunityUtil.getJsonString(0, "发布成功!");
     }
 
+    /**
+     * 查看帖子详情
+     *
+     * @param discussPostId 帖子 Id
+     * @param model         model
+     * @param page          评论分页信息
+     * @return 导向页面
+     */
     @GetMapping("/detail/{discussPostId}")
-    public String getDiscussPost(@PathVariable int discussPostId, Model model) {
+    public String getDiscussPost(@PathVariable int discussPostId, Model model, Page page) {
         DiscussPost discussPost = discussPostService.findDiscussPostById(discussPostId);
         model.addAttribute("post", discussPost);
 
@@ -59,7 +80,58 @@ public class DiscussPostController {
         User user = userService.findUserById(discussPost.getUserId());
         model.addAttribute("user", user);
 
+        // 评论分页信息
+        page.setLimit(5);
+        page.setPath("/discuss/detail/" + discussPostId);
+        page.setRows(discussPost.getCommentCount());
+
+        // 评论: 给帖子的评论
+        // 回复: 给评论的评论
+        // 评论列表
+        List<Comment> commentList = commentService.findCommentsByEntity(ENTITY_TYPE_POST, discussPost.getId(), page.getOffset(), page.getLimit());
+
+        // 评论 VO 列表
+        List<Map<String, Object>> commentVoList = new ArrayList<>();
+        if (commentList != null) {
+            for (Comment comment : commentList) {
+                // 评论 VO
+                Map<String, Object> commentVo = new HashMap<>();
+                // 评论
+                commentVo.put("comment", comment);
+                // 作者
+                commentVo.put("user", userService.findUserById(comment.getUserId()));
+
+                // 回复列表
+                List<Comment> replyList = commentService.findCommentsByEntity(ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE);
+                // 回复 VO 列表
+                List<Map<String, Object>> replyVoList = new ArrayList<>();
+                if (replyList != null) {
+                    for (Comment reply : replyList) {
+                        Map<String, Object> replyVo = new HashMap<>();
+                        // 回复
+                        replyVo.put("reply", reply);
+                        replyVo.put("user", userService.findUserById(reply.getUserId()));
+                        // 回复目标
+                        User target = reply.getTargetId() == 0 ? null : userService.findUserById(reply.getTargetId());
+                        replyVo.put("target", target);
+
+                        replyVoList.add(replyVo);
+                    }
+                }
+                commentVo.put("replys", replyVoList);
+
+                // 回复数量
+                int replyCount = commentService.findCommentCount(ENTITY_TYPE_COMMENT, comment.getId());
+                commentVo.put("replyCount", replyCount);
+
+                commentVoList.add(commentVo);
+            }
+        }
+
+        model.addAttribute("comments", commentVoList);
+
         return "site/discuss-detail";
     }
+
 
 }
