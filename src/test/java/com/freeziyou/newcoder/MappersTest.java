@@ -1,9 +1,11 @@
 package com.freeziyou.newcoder;
 
 import com.freeziyou.newcoder.dao.LoginTicketMapper;
+import com.freeziyou.newcoder.dao.MessageMapper;
 import com.freeziyou.newcoder.dao.UserMapper;
 import com.freeziyou.newcoder.entity.DiscussPost;
 import com.freeziyou.newcoder.entity.LoginTicket;
+import com.freeziyou.newcoder.entity.Message;
 import com.freeziyou.newcoder.entity.User;
 import com.freeziyou.newcoder.service.DiscussPostService;
 import com.freeziyou.newcoder.service.UserService;
@@ -35,6 +37,9 @@ public class MappersTest {
 
     @Autowired
     LoginTicketMapper loginTicketMapper;
+
+    @Autowired
+    MessageMapper messageMapper;
 
     @Test
     public void test1() {
@@ -75,9 +80,6 @@ public class MappersTest {
         for (DiscussPost post : list) {
             System.out.println(post);
         }
-
-//        int rows = discussPostService.selectDiscussPostsRows(149);
-//        System.out.println(rows);
     }
 
     @Test
@@ -98,5 +100,27 @@ public class MappersTest {
         loginTicketMapper.updateStatus("qqq", 1);
         loginTicket = loginTicketMapper.selectByTicket("qqq");
         System.out.println(loginTicket);
+    }
+
+    @Test
+    public void testSelectLetter() {
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        List<Message> messageLetter = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message : messageLetter) {
+            System.out.println(message);
+        }
+
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
     }
 }
