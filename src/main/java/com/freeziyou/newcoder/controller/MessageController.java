@@ -127,7 +127,6 @@ public class MessageController {
                 }
             }
         }
-
         return ids;
     }
 
