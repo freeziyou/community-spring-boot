@@ -144,7 +144,9 @@
                         </h6>
                         <div class=" text-muted font-size-12">
                             <!-- 发布时间 -->
-                            <u class="mr-3" th:text="${map.user.username}"></u> 发布于 <b
+                            <u>
+                                <a class="mr-3 text-warning" th:text="${map.user.username}" th:href="@{|/user/profile/${map.user.id}|}"></a>
+                            </u> 发布于 <b
                                 th:text="${#dates.format(map.post.createTime, 'yyyy-MM-dd HH:mm:ss')}"></b>
                             <ul class="d-inline float-right">
                                 <li class="d-inline ml-2">赞 <span th:text="${map.likeCount}">11</span></li>
