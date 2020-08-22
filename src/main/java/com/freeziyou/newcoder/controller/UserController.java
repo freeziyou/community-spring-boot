@@ -2,6 +2,7 @@ package com.freeziyou.newcoder.controller;
 
 import com.freeziyou.newcoder.annotation.LoginRequired;
 import com.freeziyou.newcoder.entity.User;
+import com.freeziyou.newcoder.service.LikeService;
 import com.freeziyou.newcoder.service.UserService;
 import com.freeziyou.newcoder.util.CommunityUtil;
 import com.freeziyou.newcoder.util.HostHolder;
@@ -51,6 +52,9 @@ public class UserController {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private LikeService likeService;
 
     @LoginRequired
     @GetMapping("/setting")
@@ -130,6 +134,23 @@ public class UserController {
             // 修改成功, 退出登录
             return "redirect:/logout";
         }
+    }
+
+    @GetMapping("/profile/{userId}")
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+        return "/site/profile";
+
     }
 
 }
