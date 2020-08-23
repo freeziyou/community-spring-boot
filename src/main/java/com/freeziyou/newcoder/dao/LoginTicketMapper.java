@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
  * @description TODO
  */
 @Repository
+@Deprecated
 public interface LoginTicketMapper {
 
     @Insert({
