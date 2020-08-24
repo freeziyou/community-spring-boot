@@ -1,7 +1,9 @@
 package com.freeziyou.newcoder.controller;
 
+import com.freeziyou.newcoder.entity.Event;
 import com.freeziyou.newcoder.entity.Page;
 import com.freeziyou.newcoder.entity.User;
+import com.freeziyou.newcoder.event.EventProducer;
 import com.freeziyou.newcoder.service.FollowService;
 import com.freeziyou.newcoder.service.UserService;
 import com.freeziyou.newcoder.util.CommunityConstant;
@@ -35,11 +37,24 @@ public class FollowController implements CommunityConstant {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @PostMapping("/follow")
     @ResponseBody
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
         followService.follow(user.getId(), entityType, entityId);
+
+        // 触发关注事件, 生成 event
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJsonString(0, "已关注!");
     }

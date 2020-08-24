@@ -1,7 +1,12 @@
 package com.freeziyou.newcoder.controller;
 
 import com.freeziyou.newcoder.entity.Comment;
+import com.freeziyou.newcoder.entity.DiscussPost;
+import com.freeziyou.newcoder.entity.Event;
+import com.freeziyou.newcoder.event.EventProducer;
 import com.freeziyou.newcoder.service.CommentService;
+import com.freeziyou.newcoder.service.DiscussPostService;
+import com.freeziyou.newcoder.util.CommunityConstant;
 import com.freeziyou.newcoder.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Controller
 @RequestMapping("/comment")
-public class CommentController {
+public class CommentController implements CommunityConstant {
 
     @Autowired
     private CommentService commentService;
@@ -28,12 +33,37 @@ public class CommentController {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
+
+    @Autowired
+    private DiscussPostService discussPostService;
+
     @PostMapping("/add/{discussPostId}")
     public String addComment(@PathVariable String discussPostId, Comment comment) {
         comment.setUserId(hostHolder.getUser().getId());
         comment.setStatus(0);
         comment.setCreateTime(new Date());
         commentService.addComment(comment);
+
+        // 触发评论事件, 生成 event
+        Event event = new Event()
+                .setTopic(TOPIC_COMMENT)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(comment.getEntityType())
+                .setEntityId(comment.getEntityId())
+                .setData("postId", discussPostId);
+
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+            DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {
+            Comment target = commentService.findCommentById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        }
+
+        // 发布消息
+        eventProducer.fireEvent(event);
 
         return "redirect:/discuss/detail/" + discussPostId;
     }

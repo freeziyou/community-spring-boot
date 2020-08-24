@@ -31,7 +31,9 @@
                         </li>
                         <li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
                             <a class="nav-link position-relative" th:href="@{/letter/list}">消息<span
-                                    class="badge badge-danger">12</span></a>
+                                    class="badge badge-danger" th:if="${allUnreadCount!=0}"
+                                    th:text="${allUreadCount!=0?allUnreadCount:''}">12</span>
+                            </a>
                         </li>
                         <li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
                             <a class="nav-link" th:href="@{/register}">注册</a>
@@ -46,7 +48,8 @@
                                      style="width:30px;"/>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item text-center" th:href="@{|/user/profile/${loginUser.id}|}">个人主页</a>
+                                <a class="dropdown-item text-center"
+                                   th:href="@{|/user/profile/${loginUser.id}|}">个人主页</a>
                                 <a class="dropdown-item text-center" th:href="@{/user/setting}">账号设置</a>
                                 <a class="dropdown-item text-center" th:href="@{/logout}">退出登录</a>
                                 <div class="dropdown-divider"></div>
@@ -79,7 +82,7 @@
                 </ul>
                 <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal"
                         data-target="#publishModal"
-                th:if="${loginUser!=null}">我要发布
+                        th:if="${loginUser!=null}">我要发布
                 </button>
             </div>
             <!-- 弹出框 -->
@@ -145,7 +148,8 @@
                         <div class=" text-muted font-size-12">
                             <!-- 发布时间 -->
                             <u>
-                                <a class="mr-3 text-warning" th:text="${map.user.username}" th:href="@{|/user/profile/${map.user.id}|}"></a>
+                                <a class="mr-3 text-warning" th:text="${map.user.username}"
+                                   th:href="@{|/user/profile/${map.user.id}|}"></a>
                             </u> 发布于 <b
                                 th:text="${#dates.format(map.post.createTime, 'yyyy-MM-dd HH:mm:ss')}"></b>
                             <ul class="d-inline float-right">
