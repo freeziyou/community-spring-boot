@@ -5,3 +5,5 @@
 * 持久层: MyBatis Redis
 * 业务层: SpringMVC Spring
 * 框架: Spring Boot
+* 搜索引擎: ElasticSearch
+* 消息队列: Kafka

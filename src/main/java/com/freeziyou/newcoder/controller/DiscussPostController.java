@@ -1,9 +1,7 @@
 package com.freeziyou.newcoder.controller;
 
-import com.freeziyou.newcoder.entity.Comment;
-import com.freeziyou.newcoder.entity.DiscussPost;
-import com.freeziyou.newcoder.entity.Page;
-import com.freeziyou.newcoder.entity.User;
+import com.freeziyou.newcoder.entity.*;
+import com.freeziyou.newcoder.event.EventProducer;
 import com.freeziyou.newcoder.service.CommentService;
 import com.freeziyou.newcoder.service.DiscussPostService;
 import com.freeziyou.newcoder.service.LikeService;
@@ -42,6 +40,9 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     /**
      * 添加帖子
      *
@@ -63,6 +64,14 @@ public class DiscussPostController implements CommunityConstant {
         post.setContent(content);
         post.setCreateTime(new Date());
         discussPostService.addDiscussPost(post);
+
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(post.getId());
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJsonString(0, "发布成功!");
     }

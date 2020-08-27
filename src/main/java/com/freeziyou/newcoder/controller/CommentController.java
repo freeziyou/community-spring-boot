@@ -40,7 +40,7 @@ public class CommentController implements CommunityConstant {
     private DiscussPostService discussPostService;
 
     @PostMapping("/add/{discussPostId}")
-    public String addComment(@PathVariable String discussPostId, Comment comment) {
+    public String addComment(@PathVariable int discussPostId, Comment comment) {
         comment.setUserId(hostHolder.getUser().getId());
         comment.setStatus(0);
         comment.setCreateTime(new Date());
@@ -61,9 +61,17 @@ public class CommentController implements CommunityConstant {
             Comment target = commentService.findCommentById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
         }
-
-        // 发布消息
         eventProducer.fireEvent(event);
+
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+            // 触发发帖事件
+            event = new Event()
+                    .setTopic(TOPIC_PUBLISH)
+                    .setUserId(comment.getUserId())
+                    .setEntityType(ENTITY_TYPE_POST)
+                    .setEntityId(discussPostId);
+            eventProducer.fireEvent(event);
+        }
 
         return "redirect:/discuss/detail/" + discussPostId;
     }
